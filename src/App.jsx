@@ -1,15 +1,16 @@
+import { Routes, Route, Navigate } from 'react-router-dom'
+import Login from './pages/Login'
+import Register from './pages/Register'
+import Dashboard from './pages/Dashboard'
+
 function App() {
   return (
-    <div className="min-h-screen bg-primary-900 flex items-center justify-center">
-      <div className="text-center px-6">
-        <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
-          Meridian Bank
-        </h1>
-        <p className="text-primary-200 text-lg">
-          Modern banking, built right.
-        </p>
-      </div>
-    </div>
+    <Routes>
+      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+    </Routes>
   )
 }
 
