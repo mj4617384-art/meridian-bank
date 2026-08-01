@@ -5,27 +5,61 @@ export default function Dashboard() {
   const [accounts, setAccounts] = useState([]);
   const [userName, setUserName] = useState("");
   const [loading, setLoading] = useState(true);
+  const [selectedAccount, setSelectedAccount] = useState("");
+  const [type, setType] = useState("deposit");
+  const [amount, setAmount] = useState("");
+  const [description, setDescription] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  async function loadAccounts() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      setUserName(user.user_metadata?.full_name || user.email);
+      const { data, error } = await supabase
+        .from("accounts")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("account_type");
+      if (!error) {
+        setAccounts(data);
+        if (data.length && !selectedAccount) setSelectedAccount(data[0].id);
+      }
+    }
+    setLoading(false);
+  }
 
   useEffect(() => {
-    async function loadData() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUserName(user.user_metadata?.full_name || user.email);
-        const { data, error } = await supabase
-          .from("accounts")
-          .select("*")
-          .eq("user_id", user.id)
-          .order("account_type");
-        if (!error) setAccounts(data);
-      }
-      setLoading(false);
-    }
-    loadData();
+    loadAccounts();
   }, []);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     window.location.href = "/login";
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    if (!amount || Number(amount) <= 0) {
+      setError("Enter a valid amount.");
+      return;
+    }
+    setSubmitting(true);
+    const { error } = await supabase.rpc("create_transaction", {
+      p_account_id: selectedAccount,
+      p_type: type,
+      p_amount: Number(amount),
+      p_description: description || null,
+    });
+    setSubmitting(false);
+    if (error) {
+      setError(error.message);
+    } else {
+      setAmount("");
+      setDescription("");
+      await loadAccounts();
+    }
   };
 
   const total = accounts.reduce((sum, a) => sum + Number(a.balance), 0);
@@ -56,7 +90,7 @@ export default function Dashboard() {
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="grid sm:grid-cols-2 gap-4 mb-8">
           {accounts.map((acc) => (
             <div key={acc.id} className="bg-white border border-[#0B1D3A]/10 rounded-xl p-5">
               <p className="text-xs uppercase tracking-wide text-[#0B1D3A]/50 mb-1">
@@ -67,6 +101,80 @@ export default function Dashboard() {
               </p>
             </div>
           ))}
+        </div>
+
+        <div className="bg-white border border-[#0B1D3A]/10 rounded-xl p-6">
+          <h2 className="font-serif text-lg mb-4">New Transaction</h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm text-[#0B1D3A]/60 mb-1">Account</label>
+              <select
+                value={selectedAccount}
+                onChange={(e) => setSelectedAccount(e.target.value)}
+                className="w-full border border-[#0B1D3A]/20 rounded-lg px-3 py-2"
+              >
+                {accounts.map((acc) => (
+                  <option key={acc.id} value={acc.id}>
+                    {acc.account_type.charAt(0).toUpperCase() + acc.account_type.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm text-[#0B1D3A]/60 mb-1">Type</label>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setType("deposit")}
+                  className={`flex-1 py-2 rounded-lg border ${type === "deposit" ? "bg-[#0B1D3A] text-white border-[#0B1D3A]" : "border-[#0B1D3A]/20 text-[#0B1D3A]"}`}
+                >
+                  Deposit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setType("withdrawal")}
+                  className={`flex-1 py-2 rounded-lg border ${type === "withdrawal" ? "bg-[#0B1D3A] text-white border-[#0B1D3A]" : "border-[#0B1D3A]/20 text-[#0B1D3A]"}`}
+                >
+                  Withdrawal
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm text-[#0B1D3A]/60 mb-1">Amount</label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="0.00"
+                className="w-full border border-[#0B1D3A]/20 rounded-lg px-3 py-2"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm text-[#0B1D3A]/60 mb-1">Description (optional)</label>
+              <input
+                type="text"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="e.g. Paycheck, groceries"
+                className="w-full border border-[#0B1D3A]/20 rounded-lg px-3 py-2"
+              />
+            </div>
+
+            {error && <p className="text-red-600 text-sm">{error}</p>}
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full bg-[#C9A24B] text-[#0B1D3A] font-medium py-2.5 rounded-lg hover:bg-[#dab55f] transition disabled:opacity-50"
+            >
+              {submitting ? "Processing..." : "Submit Transaction"}
+            </button>
+          </form>
         </div>
       </div>
     </div>
