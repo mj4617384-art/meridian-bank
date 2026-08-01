@@ -1,68 +1,74 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
+import { useEffect, useState } from "react";
+import { supabase } from "../lib/supabase";
 
-function Dashboard() {
-  const navigate = useNavigate()
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
+export default function Dashboard() {
+  const [accounts, setAccounts] = useState([]);
+  const [userName, setUserName] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        navigate('/login')
-        return
+    async function loadData() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserName(user.user_metadata?.full_name || user.email);
+        const { data, error } = await supabase
+          .from("accounts")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("account_type");
+        if (!error) setAccounts(data);
       }
-      setUser(user)
-      setLoading(false)
+      setLoading(false);
     }
-    checkUser()
-  }, [navigate])
+    loadData();
+  }, []);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    navigate('/login')
-  }
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    window.location.href = "/login";
+  };
+
+  const total = accounts.reduce((sum, a) => sum + Number(a.balance), 0);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-primary-900 flex items-center justify-center">
-        <p className="text-white">Loading...</p>
-      </div>
-    )
+    return <div className="min-h-screen flex items-center justify-center text-[#0B1D3A]">Loading...</div>;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-primary-900 px-6 py-4 flex justify-between items-center">
-        <h1 className="text-white font-bold text-xl">Meridian Bank</h1>
-        <button
-          onClick={handleLogout}
-          className="text-primary-200 hover:text-white text-sm font-medium"
-        >
-          Sign Out
-        </button>
+    <div className="min-h-screen bg-[#F6F5F1] text-[#0B1D3A] font-sans">
+      <nav className="bg-[#0B1D3A] text-white">
+        <div className="max-w-4xl mx-auto px-5 py-4 flex items-center justify-between">
+          <span className="font-serif text-xl">Meridian Bank</span>
+          <button onClick={handleSignOut} className="text-sm text-white/80 hover:text-white">
+            Sign Out
+          </button>
+        </div>
       </nav>
 
-      <div className="max-w-4xl mx-auto px-6 py-10">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Welcome, {user?.user_metadata?.full_name || user?.email}
-        </h2>
-        <p className="text-gray-600 mb-8">
-          Here's your account overview.
-        </p>
+      <div className="max-w-4xl mx-auto px-5 py-10">
+        <h1 className="text-2xl font-bold mb-1">Welcome, {userName}</h1>
+        <p className="text-[#0B1D3A]/60 mb-8">Here's your account overview.</p>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-          <p className="text-sm text-gray-500 mb-1">Total Balance</p>
-          <p className="text-3xl font-bold text-gray-900">$0.00</p>
-          <p className="text-sm text-gray-400 mt-2">
-            Account features coming soon
+        <div className="bg-[#0B1D3A] text-white rounded-2xl p-6 mb-6">
+          <p className="text-white/60 text-sm mb-1">Total Balance</p>
+          <p className="font-serif text-4xl">
+            ${total.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </p>
+        </div>
+
+        <div className="grid sm:grid-cols-2 gap-4">
+          {accounts.map((acc) => (
+            <div key={acc.id} className="bg-white border border-[#0B1D3A]/10 rounded-xl p-5">
+              <p className="text-xs uppercase tracking-wide text-[#0B1D3A]/50 mb-1">
+                {acc.account_type}
+              </p>
+              <p className="font-serif text-2xl">
+                ${Number(acc.balance).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </div>
-  )
+  );
 }
-
-export default Dashboard
