@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+       import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 
 export default function Dashboard() {
@@ -11,6 +11,7 @@ export default function Dashboard() {
   const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [hideBalance, setHideBalance] = useState(false);
 
   async function loadAccounts() {
     const { data: { user } } = await supabase.auth.getUser();
@@ -64,8 +65,17 @@ export default function Dashboard() {
 
   const total = accounts.reduce((sum, a) => sum + Number(a.balance), 0);
 
+  const formatMoney = (val) =>
+    hideBalance
+      ? "••••••"
+      : `$${Number(val).toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
+
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center text-[#0B1D3A]">Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center text-[#0B1D3A]">
+        Loading...
+      </div>
+    );
   }
 
   return (
@@ -84,10 +94,17 @@ export default function Dashboard() {
         <p className="text-[#0B1D3A]/60 mb-8">Here's your account overview.</p>
 
         <div className="bg-[#0B1D3A] text-white rounded-2xl p-6 mb-6">
-          <p className="text-white/60 text-sm mb-1">Total Balance</p>
-          <p className="font-serif text-4xl">
-            ${total.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-          </p>
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-white/60 text-sm">Total Balance</p>
+            <button
+              onClick={() => setHideBalance(!hideBalance)}
+              className="text-white/60 hover:text-white text-lg"
+              aria-label="Toggle balance visibility"
+            >
+              {hideBalance ? "👁️" : "🙈"}
+            </button>
+          </div>
+          <p className="font-serif text-4xl">{formatMoney(total)}</p>
         </div>
 
         <div className="grid sm:grid-cols-2 gap-4 mb-8">
@@ -96,9 +113,7 @@ export default function Dashboard() {
               <p className="text-xs uppercase tracking-wide text-[#0B1D3A]/50 mb-1">
                 {acc.account_type}
               </p>
-              <p className="font-serif text-2xl">
-                ${Number(acc.balance).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-              </p>
+              <p className="font-serif text-2xl">{formatMoney(acc.balance)}</p>
             </div>
           ))}
         </div>
@@ -127,14 +142,22 @@ export default function Dashboard() {
                 <button
                   type="button"
                   onClick={() => setType("deposit")}
-                  className={`flex-1 py-2 rounded-lg border ${type === "deposit" ? "bg-[#0B1D3A] text-white border-[#0B1D3A]" : "border-[#0B1D3A]/20 text-[#0B1D3A]"}`}
+                  className={`flex-1 py-2 rounded-lg border ${
+                    type === "deposit"
+                      ? "bg-[#0B1D3A] text-white border-[#0B1D3A]"
+                      : "border-[#0B1D3A]/20 text-[#0B1D3A]"
+                  }`}
                 >
                   Deposit
                 </button>
                 <button
                   type="button"
                   onClick={() => setType("withdrawal")}
-                  className={`flex-1 py-2 rounded-lg border ${type === "withdrawal" ? "bg-[#0B1D3A] text-white border-[#0B1D3A]" : "border-[#0B1D3A]/20 text-[#0B1D3A]"}`}
+                  className={`flex-1 py-2 rounded-lg border ${
+                    type === "withdrawal"
+                      ? "bg-[#0B1D3A] text-white border-[#0B1D3A]"
+                      : "border-[#0B1D3A]/20 text-[#0B1D3A]"
+                  }`}
                 >
                   Withdrawal
                 </button>
@@ -155,7 +178,9 @@ export default function Dashboard() {
             </div>
 
             <div>
-              <label className="block text-sm text-[#0B1D3A]/60 mb-1">Description (optional)</label>
+              <label className="block text-sm text-[#0B1D3A]/60 mb-1">
+                Description (optional)
+              </label>
               <input
                 type="text"
                 value={description}
@@ -179,4 +204,4 @@ export default function Dashboard() {
       </div>
     </div>
   );
-}
+}     
