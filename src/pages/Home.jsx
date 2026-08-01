@@ -1,14 +1,41 @@
 import { Link } from "react-router-dom";
-import { ShieldCheck, Landmark, TrendingUp, ArrowRight, CheckCircle2 } from "lucide-react";
+
+const CheckIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-[#C9A24B] shrink-0">
+    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.75" />
+    <path d="M8 12l3 3 5-6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+const LandmarkIcon = ({ className }) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={className}>
+    <path d="M3 10l9-6 9 6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M4 10v9M20 10v9M8 10v9M16 10v9M2 21h20" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+  </svg>
+);
+const TrendIcon = ({ className }) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={className}>
+    <path d="M3 17l6-6 4 4 8-8M15 7h6v6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+const ShieldIcon = ({ className }) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={className}>
+    <path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round" />
+    <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+const ArrowIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+    <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-[#F6F5F1] text-[#0B1D3A] font-sans">
-      {/* Nav */}
       <nav className="bg-[#0B1D3A] text-white">
         <div className="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Landmark className="w-6 h-6 text-[#C9A24B]" strokeWidth={1.75} />
+            <LandmarkIcon className="w-6 h-6 text-[#C9A24B]" />
             <span className="font-serif text-xl tracking-tight">Meridian Bank</span>
           </div>
           <Link to="/login" className="text-sm border border-white/30 rounded-full px-4 py-1.5 hover:bg-white/10 transition">
@@ -17,7 +44,6 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero */}
       <section
         className="relative overflow-hidden bg-[#0B1D3A] text-white"
         style={{
@@ -38,15 +64,17 @@ export default function Home() {
               one clear view — no clutter, no guesswork.
             </p>
             <Link to="/register" className="inline-flex items-center gap-2 bg-[#C9A24B] text-[#0B1D3A] font-medium rounded-full px-6 py-3 hover:bg-[#dab55f] transition">
-              Open an account <ArrowRight className="w-4 h-4" />
+              Open an account <ArrowIcon />
             </Link>
           </div>
           <div className="relative">
-            <img
-              src="https://picsum.photos/seed/meridian-hero/640/480"
-              alt="Person reviewing finances on a laptop"
-              className="rounded-2xl w-full h-72 sm:h-96 object-cover shadow-2xl"
-            />
+            <div className="rounded-2xl w-full h-72 sm:h-96 shadow-2xl bg-gradient-to-br from-[#1c3b6e] to-[#0B1D3A] flex items-center justify-center">
+              <svg width="120" height="120" viewBox="0 0 24 24" fill="none" className="text-white/25">
+                <path d="M12 2L2 7v2h20V7L12 2z" fill="currentColor" />
+                <path d="M4 10v9h2v-9H4zm5 0v9h2v-9H9zm5 0v9h2v-9h-2zm5 0v9h2v-9h-2z" fill="currentColor" />
+                <path d="M2 21h20v2H2z" fill="currentColor" />
+              </svg>
+            </div>
             <div className="absolute -bottom-4 -left-4 bg-white text-[#0B1D3A] rounded-xl px-4 py-3 shadow-lg hidden sm:block">
               <p className="text-xs text-[#0B1D3A]/60">Total Balance</p>
               <p className="font-serif text-lg">$4,218.60</p>
@@ -55,7 +83,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Trust checklist band */}
       <section className="bg-[#132A52] text-white">
         <div className="max-w-6xl mx-auto px-5 py-6 grid sm:grid-cols-3 gap-4">
           {[
@@ -64,48 +91,28 @@ export default function Home() {
             "Bank-level encryption on every login",
           ].map((item) => (
             <div key={item} className="flex items-center gap-2.5">
-              <CheckCircle2 className="w-4 h-4 text-[#C9A24B] shrink-0" />
+              <CheckIcon />
               <span className="text-sm text-white/90">{item}</span>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Services */}
       <section className="max-w-6xl mx-auto px-5 py-16">
         <h2 className="font-serif text-2xl mb-1">What Meridian handles for you</h2>
-        <p className="text-[#0B1D3A]/60 mb-10">
-          Three tools, one login, zero friction.
-        </p>
+        <p className="text-[#0B1D3A]/60 mb-10">Three tools, one login, zero friction.</p>
         <div className="grid sm:grid-cols-3 gap-6">
           {[
-            {
-              icon: Landmark,
-              title: "Everyday Checking",
-              desc: "A single account for spending and receiving, with a live running balance.",
-              img: "checking",
-            },
-            {
-              icon: TrendingUp,
-              title: "Savings, Visualized",
-              desc: "Watch your balance trend over time instead of guessing from statements.",
-              img: "savings",
-            },
-            {
-              icon: ShieldCheck,
-              title: "Account Security",
-              desc: "Every sign-in and transaction is logged and confirmed, end to end.",
-              img: "security",
-            },
-          ].map(({ icon: Icon, title, desc, img }) => (
+            { icon: LandmarkIcon, title: "Everyday Checking", desc: "A single account for spending and receiving, with a live running balance." },
+            { icon: TrendIcon, title: "Savings, Visualized", desc: "Watch your balance trend over time instead of guessing from statements." },
+            { icon: ShieldIcon, title: "Account Security", desc: "Every sign-in and transaction is logged and confirmed, end to end." },
+          ].map(({ icon: Icon, title, desc }) => (
             <div key={title} className="border border-[#0B1D3A]/10 rounded-xl overflow-hidden bg-white hover:shadow-md transition">
-              <img
-                src={`https://picsum.photos/seed/meridian-${img}/400/220`}
-                alt=""
-                className="w-full h-36 object-cover"
-              />
+              <div className="w-full h-36 bg-gradient-to-br from-[#132A52] to-[#0B1D3A] flex items-center justify-center">
+                <Icon className="w-10 h-10 text-[#C9A24B]/70" />
+              </div>
               <div className="p-6">
-                <Icon className="w-6 h-6 text-[#C9A24B] mb-4" strokeWidth={1.75} />
+                <Icon className="w-6 h-6 text-[#C9A24B] mb-4" />
                 <h3 className="font-serif text-lg mb-2">{title}</h3>
                 <p className="text-sm text-[#0B1D3A]/65 leading-relaxed">{desc}</p>
               </div>
@@ -114,7 +121,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="bg-[#0B1D3A] text-white/50 text-xs py-6">
         <div className="max-w-6xl mx-auto px-5">
           Meridian Bank is a fictional portfolio project. Not a real financial institution.
