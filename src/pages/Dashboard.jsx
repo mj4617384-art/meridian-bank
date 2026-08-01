@@ -1,5 +1,17 @@
-       import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
+
+const EyeIcon = ({ className }) => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className={className}>
+    <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.75" />
+  </svg>
+);
+const EyeOffIcon = ({ className }) => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className={className}>
+    <path d="M17.94 17.94A10.94 10.94 0 0112 19c-7 0-11-7-11-7a20.3 20.3 0 015.06-5.94M9.9 4.24A10.4 10.4 0 0112 4c7 0 11 7 11 7a20.3 20.3 0 01-2.66 3.75M14.12 14.12a3 3 0 11-4.24-4.24M1 1l22 22" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 
 export default function Dashboard() {
   const [accounts, setAccounts] = useState([]);
@@ -98,10 +110,10 @@ export default function Dashboard() {
             <p className="text-white/60 text-sm">Total Balance</p>
             <button
               onClick={() => setHideBalance(!hideBalance)}
-              className="text-white/60 hover:text-white text-lg"
+              className="text-white/50 hover:text-white transition"
               aria-label="Toggle balance visibility"
             >
-              {hideBalance ? "👁️" : "🙈"}
+              {hideBalance ? <EyeOffIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
             </button>
           </div>
           <p className="font-serif text-4xl">{formatMoney(total)}</p>
@@ -204,4 +216,8 @@ export default function Dashboard() {
       </div>
     </div>
   );
-}     
+}       
+      
+          
+              
+               
