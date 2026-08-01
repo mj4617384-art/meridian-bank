@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+        import { Link } from "react-router-dom";
 
 const CheckIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-[#C9A24B] shrink-0">
@@ -38,7 +38,7 @@ export default function Home() {
             <LandmarkIcon className="w-6 h-6 text-[#C9A24B]" />
             <span className="font-serif text-xl tracking-tight">Meridian Bank</span>
           </div>
-          <Link to="/login" className="text-sm border border-white/30 rounded-full px-4 py-1.5 hover:bg-white/10 transition">
+          <Link to="/login" className="text-sm border border-white/30 rounded px-4 py-1.5 hover:bg-white/10 transition">
             Sign In
           </Link>
         </div>
@@ -48,35 +48,38 @@ export default function Home() {
         className="relative overflow-hidden bg-[#0B1D3A] text-white"
         style={{
           backgroundImage:
-            "repeating-linear-gradient(to bottom, rgba(255,255,255,0.045) 0px, rgba(255,255,255,0.045) 1px, transparent 1px, transparent 40px)",
+            "repeating-linear-gradient(to bottom, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 48px)",
         }}
       >
-        <div className="max-w-6xl mx-auto px-5 pt-16 pb-20 grid md:grid-cols-2 gap-10 items-center">
+        <div className="max-w-6xl mx-auto px-5 pt-20 pb-24 grid md:grid-cols-2 gap-14 items-center">
           <div>
-            <p className="text-[#C9A24B] text-sm tracking-[0.2em] uppercase mb-4">
-              Personal Banking, Reimagined
+            <p className="text-[#C9A24B]/90 text-xs tracking-[0.25em] uppercase mb-5 font-medium">
+              Est. Personal &amp; Business Banking
             </p>
-            <h1 className="font-serif text-4xl sm:text-5xl leading-tight mb-5">
+            <h1 className="font-serif text-4xl sm:text-5xl leading-[1.15] mb-6 text-white/95">
               Your money, moving with intention.
             </h1>
-            <p className="text-white/70 max-w-md mb-8 leading-relaxed">
+            <p className="text-white/60 max-w-md mb-9 leading-relaxed">
               Meridian keeps your balance, your history, and your next move in
               one clear view — no clutter, no guesswork.
             </p>
-            <Link to="/register" className="inline-flex items-center gap-2 bg-[#C9A24B] text-[#0B1D3A] font-medium rounded-full px-6 py-3 hover:bg-[#dab55f] transition">
+            <Link to="/register" className="inline-flex items-center gap-2 bg-[#C9A24B] text-[#0B1D3A] font-medium rounded px-7 py-3 hover:bg-[#b8934a] transition text-sm tracking-wide uppercase">
               Open an account <ArrowIcon />
             </Link>
           </div>
-          <div className="relative">
-            <div className="rounded-2xl w-full h-72 sm:h-96 shadow-2xl bg-gradient-to-br from-[#1c3b6e] to-[#0B1D3A] flex items-center justify-center">
-              <svg width="120" height="120" viewBox="0 0 24 24" fill="none" className="text-white/25">
-                <path d="M12 2L2 7v2h20V7L12 2z" fill="currentColor" />
-                <path d="M4 10v9h2v-9H4zm5 0v9h2v-9H9zm5 0v9h2v-9h-2zm5 0v9h2v-9h-2z" fill="currentColor" />
-                <path d="M2 21h20v2H2z" fill="currentColor" />
-              </svg>
+          <div className="relative flex items-center justify-center">
+            <div className="rounded-full w-64 h-64 sm:w-80 sm:h-80 border border-[#C9A24B]/30 flex items-center justify-center">
+              <div className="rounded-full w-52 h-52 sm:w-64 sm:h-64 border border-[#C9A24B]/50 flex items-center justify-center">
+                <svg width="110" height="110" viewBox="0 0 24 24" fill="none" className="text-[#C9A24B]">
+                  <path d="M12 2L2 8h20L12 2z" stroke="currentColor" strokeWidth="1" fill="currentColor" fillOpacity="0.9" />
+                  <path d="M4 10v9M8 10v9M12 10v9M16 10v9M20 10v9" stroke="currentColor" strokeWidth="1.25" />
+                  <path d="M2 21h20" stroke="currentColor" strokeWidth="1.25" />
+                  <path d="M2 9h20" stroke="currentColor" strokeWidth="1" />
+                </svg>
+              </div>
             </div>
-            <div className="absolute -bottom-4 -left-4 bg-white text-[#0B1D3A] rounded-xl px-4 py-3 shadow-lg hidden sm:block">
-              <p className="text-xs text-[#0B1D3A]/60">Total Balance</p>
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-white text-[#0B1D3A] rounded-lg px-5 py-3 shadow-xl">
+              <p className="text-[10px] uppercase tracking-widest text-[#0B1D3A]/50">Total Balance</p>
               <p className="font-serif text-lg">$4,218.60</p>
             </div>
           </div>
@@ -107,9 +110,9 @@ export default function Home() {
             { icon: TrendIcon, title: "Savings, Visualized", desc: "Watch your balance trend over time instead of guessing from statements." },
             { icon: ShieldIcon, title: "Account Security", desc: "Every sign-in and transaction is logged and confirmed, end to end." },
           ].map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="border border-[#0B1D3A]/10 rounded-xl overflow-hidden bg-white hover:shadow-md transition">
-              <div className="w-full h-36 bg-gradient-to-br from-[#132A52] to-[#0B1D3A] flex items-center justify-center">
-                <Icon className="w-10 h-10 text-[#C9A24B]/70" />
+            <div key={title} className="border border-[#0B1D3A]/10 rounded overflow-hidden bg-white hover:shadow-md transition">
+              <div className="w-full h-36 bg-[#0B1D3A] flex items-center justify-center">
+                <Icon className="w-9 h-9 text-[#C9A24B]/70" />
               </div>
               <div className="p-6">
                 <Icon className="w-6 h-6 text-[#C9A24B] mb-4" />
@@ -128,4 +131,4 @@ export default function Home() {
       </footer>
     </div>
   );
-}
+}  
