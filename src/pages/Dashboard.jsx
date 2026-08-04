@@ -12,9 +12,16 @@ const EyeOffIcon = ({ className }) => (
     <path d="M17.94 17.94A10.94 10.94 0 0112 19c-7 0-11-7-11-7a20.3 20.3 0 015.06-5.94M9.9 4.24A10.4 10.4 0 0112 4c7 0 11 7 11 7a20.3 20.3 0 01-2.66 3.75M14.12 14.12a3 3 0 11-4.24-4.24M1 1l22 22" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
+const ChevronIcon = ({ className, open }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className={`${className} transition-transform ${open ? "rotate-180" : ""}`}>
+    <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 
 export default function Dashboard() {
   const [accounts, setAccounts] = useState([]);
+  const [transactions, setTransactions] = useState({});
+  const [expanded, setExpanded] = useState({});
   const [userName, setUserName] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedAccount, setSelectedAccount] = useState("");
@@ -29,14 +36,29 @@ export default function Dashboard() {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       setUserName(user.user_metadata?.full_name || user.email);
-      const { data, error } = await supabase
+      const { data: accData, error: accError } = await supabase
         .from("accounts")
         .select("*")
         .eq("user_id", user.id)
         .order("account_type");
-      if (!error) {
-        setAccounts(data);
-        if (data.length && !selectedAccount) setSelectedAccount(data[0].id);
+
+      if (!accError && accData) {
+        setAccounts(accData);
+        if (accData.length && !selectedAccount) setSelectedAccount(accData[0].id);
+
+        const { data: txData } = await supabase
+          .from("transactions")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false });
+
+        if (txData) {
+          const grouped = {};
+          accData.forEach((acc) => {
+            grouped[acc.id] = txData.filter((t) => t.account_id === acc.id);
+          });
+          setTransactions(grouped);
+        }
       }
     }
     setLoading(false);
@@ -75,12 +97,19 @@ export default function Dashboard() {
     }
   };
 
+  const toggleExpanded = (accId) => {
+    setExpanded((prev) => ({ ...prev, [accId]: !prev[accId] }));
+  };
+
   const total = accounts.reduce((sum, a) => sum + Number(a.balance), 0);
 
   const formatMoney = (val) =>
     hideBalance
       ? "••••••"
       : `$${Number(val).toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
+
+  const formatDate = (iso) =>
+    new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
   if (loading) {
     return (
@@ -119,15 +148,58 @@ export default function Dashboard() {
           <p className="font-serif text-4xl">{formatMoney(total)}</p>
         </div>
 
-        <div className="grid sm:grid-cols-2 gap-4 mb-8">
-          {accounts.map((acc) => (
-            <div key={acc.id} className="bg-white border border-[#0B1D3A]/10 rounded-xl p-5">
-              <p className="text-xs uppercase tracking-wide text-[#0B1D3A]/50 mb-1">
-                {acc.account_type}
-              </p>
-              <p className="font-serif text-2xl">{formatMoney(acc.balance)}</p>
-            </div>
-          ))}
+        <div className="space-y-4 mb-8">
+          {accounts.map((acc) => {
+            const accTx = transactions[acc.id] || [];
+            const isOpen = expanded[acc.id];
+            return (
+              <div key={acc.id} className="bg-white border border-[#0B1D3A]/10 rounded-xl overflow-hidden">
+                <button
+                  onClick={() => toggleExpanded(acc.id)}
+                  className="w-full text-left p-5 flex items-center justify-between"
+                >
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-[#0B1D3A]/50 mb-1">
+                      {acc.account_type}
+                    </p>
+                    <p className="font-serif text-2xl">{formatMoney(acc.balance)}</p>
+                  </div>
+                  <ChevronIcon className="text-[#0B1D3A]/40" open={isOpen} />
+                </button>
+
+                {isOpen && (
+                  <div className="border-t border-[#0B1D3A]/10 px-5 py-3">
+                    {accTx.length === 0 ? (
+                      <p className="text-sm text-[#0B1D3A]/40 py-3">No transactions yet.</p>
+                    ) : (
+                      <div className="divide-y divide-[#0B1D3A]/5">
+                        {accTx.map((tx) => (
+                          <div key={tx.id} className="flex items-center justify-between py-3">
+                            <div>
+                              <p className="text-sm font-medium">
+                                {tx.description || (tx.type === "deposit" ? "Deposit" : "Withdrawal")}
+                              </p>
+                              <p className="text-xs text-[#0B1D3A]/50">{formatDate(tx.created_at)}</p>
+                            </div>
+                            <p
+                              className={`text-sm font-medium ${
+                                tx.type === "deposit" ? "text-emerald-700" : "text-[#0B1D3A]/70"
+                              }`}
+                            >
+                              {tx.type === "deposit" ? "+" : "−"}
+                              {hideBalance
+                                ? "•••"
+                                : `$${Number(tx.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}`}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         <div className="bg-white border border-[#0B1D3A]/10 rounded-xl p-6">
@@ -216,8 +288,4 @@ export default function Dashboard() {
       </div>
     </div>
   );
-}       
-      
-          
-              
-               
+}
